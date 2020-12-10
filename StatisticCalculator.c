@@ -7,7 +7,7 @@ struct statistic
 	int length ;
 	float *input_xi;
 	float *input_ni;
-	float N , Xbar , variance ;
+	float N , Xbar , variance  , ecart_type , etendue ;
 	float *XiNi_table;
 	float *Ni_table;
 	float *Pi_table;
@@ -15,7 +15,7 @@ struct statistic
 	float *table_1;// |xi-Xbar|
 	float *table_2;// ni*|xi-Xbar|
 	float *table_3;// ni*(xi-Xbar)^2
-	int *mode_table , mode_nb ;
+	int *mode_table , mode_nb , Xmed_nb , *Xmed_table;
 };
 typedef struct statistic STATISTIC ;
 void print_ligne(char *ligne_name , float *table ,int length , int cur_value , char *next ,char symbole)
@@ -37,6 +37,12 @@ void print_ligne(char *ligne_name , float *table ,int length , int cur_value , c
 	printf("\n");
 }
 
+int scan_int(char *message )
+{
+	int output ;
+	printf("<<: %s\n",message);
+}
+
 void check_mode(STATISTIC *f_user)
 {
 	f_user->mode_nb=0;
@@ -56,6 +62,24 @@ void check_mode(STATISTIC *f_user)
 	f_user->mode_nb=j;
 }
 
+void check_med(STATISTIC *f_user)
+{
+	float temp;
+	int k=0;
+	for(int i=0;i<f_user->length;i++)
+	{
+		if(f_user->Ni_table[i]>=f_user->N/2)
+		{
+			if(f_user->N-f_user->Ni_table[i]<=f_user->N/2)
+			{	
+				f_user->Xmed_table[k++]=i;
+				f_user->Xmed_nb=k;
+				break;
+			}
+		}
+	}
+}
+
 int main()
 {
 	// freopen("input.txt","r",stdin);
@@ -64,6 +88,7 @@ int main()
 	printf("Donner moi le nombre des cases du tableux: ");
 	scanf("%d",&user.length);
 	system("cls");
+	user.Xmed_table=(int*)malloc(user.length*sizeof(int));
 	user.mode_table=(int*)malloc(user.length*sizeof(int));
 	user.input_xi=(float*)malloc(user.length*sizeof(float));
 	user.input_ni=(float*)malloc((user.length+2)*sizeof(float));
@@ -111,11 +136,13 @@ int main()
 		user.Pi_table[i]=user.fi_table[i]*100;
 		user.Pi_table[user.length]+=user.Pi_table[i];
 	}
-
 	user.table_1[user.length+1]=user.table_1[user.length]/user.N;
 	user.table_2[user.length+1]=user.table_2[user.length]/user.N;
 	user.table_3[user.length+1]=user.table_3[user.length]/user.N;
+	user.variance=user.table_3[user.length+1];
+	user.ecart_type=sqrt(user.variance);
 	check_mode(&user);
+	check_med(&user);
 	system("cls");
 	if(user.length<=8)
 	{for(int i=0;i<user.length*14+18;i++)
@@ -136,10 +163,29 @@ int main()
 	print_ligne("|xi-Xbar|",user.table_1,(user.length<=8)? user.length+2:user.length,(user.length<=8)? user.length+2:user.length,"  ",' ');
 	print_ligne("ni*|xi-Xbar|",user.table_2,(user.length<=8)? user.length+2:user.length,(user.length<=8)? user.length+2:user.length,"  ",' ');
 	print_ligne("ni*(xi-Xbar)^2",user.table_3,(user.length<=8)? user.length+2:user.length,(user.length<=8)? user.length+2:user.length,"  ",' ');
-	printf("le nombre des modes de ce tableaux statistique : %d\n",user.mode_nb+1);
+	printf(">>>>> les parametres de position\n");
+	printf("le nombre des modes: %d\n",user.mode_nb+1);
 	for(int i=0 ;i<=user.mode_nb;i++)
-		printf("mode %d: x%d= %f\n",i+1,user.mode_table[i]+1,user.input_xi[user.mode_table[i]]);
-	// int answer ;
-	// scanf("%d",&answer);
+		printf("mode %d: x%d= %10.4f\n",i+1,user.mode_table[i]+1,user.input_xi[user.mode_table[i]]);
+	printf("\nla moyenne arithmetique: Xbar=%10.4f",user.Xbar);
+	printf("\nla mediane :             x%d = %10.4f\n\n",user.Xmed_table[0]+1,user.input_xi[user.Xmed_table[0]]);
+	printf(">>>>> les parametres de dispertion\n\n");
+	printf("La variance:      V(x)= %10.4f\n",user.variance);
+	printf("Ecart type moyen: E(x)= %10.4f\n",user.table_2[user.length+1]);
+	printf("Ecart type:       e(x)= %10.4f\n",user.ecart_type);
+	printf("Etendue:         x1-x%d= %10.4f\n",user.length,user.input_xi[user.length-1]-user.input_xi[0]);
+	
+	int answer ;
+	printf("1: reessayer\n2: Sortie\nentrez la reponse:");
+	scanf("%d",&answer);
+	while(answer!=1 && answer!=2)
+	{
+		printf("1: reessayer\n2: Sortie\nentrez la reponse:");
+		scanf("%d",&answer);
+	}
+	if(answer==1)
+		main();
+	else
+		exit(1);
 	return 0 ;
 }
