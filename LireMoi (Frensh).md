@@ -56,7 +56,7 @@ nous prenons une population d'une donnée, et nous organisons chaque valeur (xi)
 
 * L'ecart_type (la racine carrée de la variance V(x) e(x)=sqrt(V(x))
 
-*L'ecart_type moyen E(x)=la somme de ni*|xi-Xbar| (0<=i<=p)
+* L'ecart_type moyen E(x)=la somme de ni*|xi-Xbar| (0<=i<=p)
 
 * Identifie la répartition des scores en indiquant les intervalles
 
