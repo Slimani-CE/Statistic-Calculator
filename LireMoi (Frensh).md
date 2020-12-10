@@ -50,11 +50,13 @@ nous prenons une population d'une donnée, et nous organisons chaque valeur (xi)
 
 3. Mesures de dispersion ou de variation
 
-* L'étendu e(X)=si nmax est le plus grand ni et nmin dans le plus petit donc e (X) = nmax-nmin
+* L'étendu e(X)=si nmax est le plus grand ni et nmin dans le plus petit donc e(X) = nmax-nmin
 
-* Variance(var)=la somme de ni*(xi-Xbar)^2)/N
+* Variance(V(x))=la somme de ni*(xi-Xbar)^2)/N (0<=i<=p)
 
-* L'ecart_type (la racine carrée de la variance (Sdev)) Sdev=sqrt(var)
+* L'ecart_type (la racine carrée de la variance V(x) e(x)=sqrt(V(x))
+
+*L'ecart_type moyen E(x)=la somme de ni*|xi-Xbar| (0<=i<=p)
 
 * Identifie la répartition des scores en indiquant les intervalles
 

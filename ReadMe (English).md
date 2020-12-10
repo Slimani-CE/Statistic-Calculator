@@ -34,32 +34,32 @@ like this:
 #some statistical parameters that the programme can calculate
 
 1. Measures of Frequency:
-* Count(ni)
+* Count(ni) (done)
 
-* Percent(pi)=(ni/N)*100
-
-* Frequency(fi)=ni/N
+* Percent(pi)=(ni/N)*100 (done)
+ 
+* Frequency(fi)=ni/N (done)
 
 * Shows how often something occurs
 
 2. Measures of Central Tendency
-* Mean(Xbar)=the sum of ni*xi devied by N
+* Mean(Xbar)=the sum of ni*xi devided by N (done)
 
 * Median(Xmed)= is the smallest xi wich her Ni is higher then N/2 ; for the example above Xmed=x4=11 because N4=435 is the
-  smallest value wich is bigger then N/2=350.
+  smallest value wich is bigger then N/2=350. (not yet)
 
-* Mode(Xmode)=is an xi wich her ni appears most often; for the example above Xmod=x4=11 because n4 is biggest value.
+* Mode(Xmode)=is an xi wich her ni appears most often; for the example above Xmod=x4=11 because n4 is biggest value. (done)
 
 
 * Use this when you want to show how an average or most commonly indicated response
 
 3. Measures of Dispersion or Variation
 
-* Range or e(X)=if nmax is the biggest ni and nmin in the smallest one so; e(X)=nmax-nmin
+* Range or e(X)=if nmax is the biggest ni and nmin is the smallest one so; e(X)=nmax-nmin (not yet)
 
-* Variance(var)=(the sum of ni*(xi-Xbar)^2)/N
+* Variance(var)=(the sum of ni*(xi-Xbar)^2)/N (done)
 
-* Standard Deviation (the square root of the variance (Sdev)) Sdev=sqrt(var)
+* Standard Deviation (the square root of the variance (Sdev)) Sdev=sqrt(var) (not yet)
 
 * Identifies the spread of scores by stating intervals
 
