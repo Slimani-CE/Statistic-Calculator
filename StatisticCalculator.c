@@ -85,8 +85,15 @@ int main()
 	// freopen("input.txt","r",stdin);
 	system("cls");
 	STATISTIC user ;
-	printf("Donner moi le nombre des cases du tableux: ");
+	printf("Donner moi le nombre des cases du tableau: ");
 	scanf("%d",&user.length);
+	while(user.length<=0)
+	{
+		system("cls");
+		printf("Donner moi le nombre des cases du tableau:");
+		scanf("%d",&user.length);
+	}
+
 	system("cls");
 	user.Xmed_table=(int*)malloc(user.length*sizeof(int));
 	user.mode_table=(int*)malloc(user.length*sizeof(int));
@@ -106,7 +113,7 @@ int main()
 		print_ligne("ni",user.input_ni,user.length,i,"           ",' ');
 		printf("Donner moi  x%d: ",i+1);
 		scanf("%f",&user.input_xi[i]);
-		printf("Donner moi  x%d: ",i+1);
+		printf("Donner moi  n%d: ",i+1);
 		scanf("%f",&user.input_ni[i]);
 		user.N+=user.input_ni[i];
 		user.Ni_table[i]=user.N;
