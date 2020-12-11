@@ -18,23 +18,43 @@ struct statistic
 	int *mode_table , mode_nb , Xmed_nb , *Xmed_table;
 };
 typedef struct statistic STATISTIC ;
-void print_ligne(char *ligne_name , float *table ,int length , int cur_value , char *next ,char symbole)
+void print_ligne(char *ligne_name , char* file_name, float *table ,int length , int cur_value , char *next ,char symbole)
 {
 	//cur_value is the current length of table
 	//next is a string printed instead of value of the blank cases
 	int i ;
-	for(i=0;i<length*14+19;i++)
-		printf("#");
-	printf("\n");
-	printf("# %14s  #",ligne_name);
-	for(i=0;i<cur_value;i++)
-		printf(" %10.4f%c #",table[i],(symbole)? symbole:' ');
-	for(i=cur_value;i<length;i++)
-		printf("             #");
-	printf("\n");
-	for(i=0;i<length*14+19;i++)
-		printf("#");
-	printf("\n");
+	if(!file_name)
+	{
+		for(i=0;i<length*14+19;i++)
+			printf("#");
+		printf("\n");
+		printf("# %14s  #",ligne_name);
+		for(i=0;i<cur_value;i++)
+			printf(" %10.4f%c #",table[i],(symbole)? symbole:' ');
+		for(i=cur_value;i<length;i++)
+			printf("             #");
+		printf("\n");
+		for(i=0;i<length*14+19;i++)
+			printf("#");
+		printf("\n");
+	}
+	else
+	{
+		FILE *file=fopen(file_name,"a");
+		for(i=0;i<length*14+19;i++)
+			fprintf(file,"#");
+		fprintf(file,"\n");
+		fprintf(file,"# %14s  #",ligne_name);
+		for(i=0;i<cur_value;i++)
+			fprintf(file," %10.4f%c #",table[i],(symbole)? symbole:' ');
+		for(i=cur_value;i<length;i++)
+			fprintf(file,"             #");
+		fprintf(file,"\n");
+		for(i=0;i<length*14+19;i++)
+			fprintf(file,"#");
+		fprintf(file,"\n");
+		fclose(file);
+	}
 }
 
 int scan_int(char *message )
@@ -80,11 +100,96 @@ void check_med(STATISTIC *f_user)
 	}
 }
 
+void print_info(char* file_name , STATISTIC *f_user)// if the user wanted to export a file the file_name!=NULL, otherwise it will be, 
+{
+	f_user->input_ni[f_user->length]=f_user->N;
+	f_user->XiNi_table[f_user->length]=f_user->Xbar;
+	f_user->Xbar/=f_user->N ;
+	f_user->XiNi_table[f_user->length+1]=f_user->Xbar;
+	f_user->table_1[f_user->length]=0;
+	f_user->table_2[f_user->length]=0;
+	f_user->table_3[f_user->length]=0;
+	f_user->fi_table[f_user->length]=0;
+	f_user->Pi_table[f_user->length]=0;
+	for(int i=0 ; i<f_user->length ; i++)
+	{
+		f_user->table_1[i]=(f_user->Xbar-f_user->input_xi[i]>0)? f_user->Xbar-f_user->input_xi[i]:-f_user->Xbar+f_user->input_xi[i] ;
+		f_user->table_1[f_user->length]+=f_user->table_1[i];
+		f_user->table_2[i]=f_user->table_1[i]*f_user->input_ni[i];
+		f_user->table_3[i]=f_user->input_ni[i]*pow(f_user->table_1[i],2);
+		f_user->table_2[f_user->length]+=f_user->table_2[i];
+		f_user->table_3[f_user->length]+=f_user->table_3[i];
+		f_user->fi_table[i]=f_user->input_ni[i]/f_user->N;
+		f_user->fi_table[f_user->length]+=f_user->fi_table[i];
+		f_user->Pi_table[i]=f_user->fi_table[i]*100;
+		f_user->Pi_table[f_user->length]+=f_user->Pi_table[i];
+	}
+	f_user->table_1[f_user->length+1]=f_user->table_1[f_user->length]/f_user->N;
+	f_user->table_2[f_user->length+1]=f_user->table_2[f_user->length]/f_user->N;
+	f_user->table_3[f_user->length+1]=f_user->table_3[f_user->length]/f_user->N;
+	f_user->variance=f_user->table_3[f_user->length+1];
+	f_user->ecart_type=sqrt(f_user->variance);
+	check_mode(f_user);
+	check_med(f_user);
+	system("cls");
+	if(f_user->length<=8 && !file_name)
+	{
+		for(int i=0;i<f_user->length*14+18;i++)
+			printf(" ");
+		printf("#############################\n");
+		for(int i=0;i<f_user->length*14+18;i++)
+			printf(" ");
+		printf("#     somme   #   somme/N   #\n");
+		for(int i=0;i<f_user->length*14+18;i++)
+			printf(" ");
+		printf("#############################\n");
+	}
+	if(f_user->length<=8 && file_name)
+	{
+		FILE *file=fopen(file_name,"a");
+		for(int i=0;i<f_user->length*14+18;i++)
+			fprintf(file," ");
+		fprintf(file,"#############################\n");
+		for(int i=0;i<f_user->length*14+18;i++)
+			fprintf(file," ");
+		fprintf(file,"#     somme   #   somme/N   #\n");
+		for(int i=0;i<f_user->length*14+18;i++)
+			fprintf(file," ");
+		fprintf(file,"#############################\n");
+		fclose(file);
+	}
+	print_ligne("xi",file_name,f_user->input_xi,(f_user->length<=8)? f_user->length+2:f_user->length,f_user->length,"           ",' ');
+	print_ligne("ni",file_name,f_user->input_ni,(f_user->length<=8)? f_user->length+2:f_user->length,(f_user->length<=8)? f_user->length+1:f_user->length,"           ",' ');
+	print_ligne("Ni",file_name,f_user->Ni_table,(f_user->length<=8)? f_user->length+2:f_user->length,f_user->length,"           ",' ');
+	print_ligne("fi",file_name,f_user->fi_table,(f_user->length<=8)? f_user->length+2:f_user->length,(f_user->length<=8)? f_user->length+1:f_user->length,"           ",' ');
+	print_ligne("Pi",file_name,f_user->Pi_table,(f_user->length<=8)? f_user->length+2:f_user->length,(f_user->length<=8)? f_user->length+1:f_user->length,"           ",'%');
+	print_ligne("xi*ni",file_name,f_user->XiNi_table,(f_user->length<=8)? f_user->length+2:f_user->length,(f_user->length<=8)? f_user->length+2:f_user->length,"  ",' ');
+	print_ligne("|xi-Xbar|",file_name,f_user->table_1,(f_user->length<=8)? f_user->length+2:f_user->length,(f_user->length<=8)? f_user->length+2:f_user->length,"  ",' ');
+	print_ligne("ni*|xi-Xbar|",file_name,f_user->table_2,(f_user->length<=8)? f_user->length+2:f_user->length,(f_user->length<=8)? f_user->length+2:f_user->length,"  ",' ');
+	print_ligne("ni*(xi-Xbar)^2",file_name,f_user->table_3,(f_user->length<=8)? f_user->length+2:f_user->length,(f_user->length<=8)? f_user->length+2:f_user->length,"  ",' ');
+	if(!file_name)
+	{
+		printf(">>>>> les parametres de position\n");
+		printf("le nombre des modes: %d\n",f_user->mode_nb+1);
+		for(int i=0 ;i<=f_user->mode_nb;i++)
+			printf("mode %d: x%d= %10.4f\n",i+1,f_user->mode_table[i]+1,f_user->input_xi[f_user->mode_table[i]]);
+		printf("\nla moyenne arithmetique: Xbar=%10.4f",f_user->Xbar);
+		printf("\nla mediane :             x%d = %10.4f\n\n",f_user->Xmed_table[0]+1,f_user->input_xi[f_user->Xmed_table[0]]);
+		printf(">>>>> les parametres de dispertion\n\n");
+		printf("La variance:      V(x)= %10.4f\n",f_user->variance);
+		printf("Ecart type moyen: E(x)= %10.4f\n",f_user->table_2[f_user->length+1]);
+		printf("Ecart type:       e(x)= %10.4f\n",f_user->ecart_type);
+		printf("Etendue:         x1-x%d= %10.4f\n",f_user->length,f_user->input_xi[f_user->length-1]-f_user->input_xi[0]);
+	}
+	
+}
+
 int main()
 {
-	// freopen("input.txt","r",stdin);
 	system("cls");
 	STATISTIC user ;
+	// freopen("input.txt","r",stdin);
+	system("cls");
 	printf("Donner moi le nombre des cases du tableau: ");
 	scanf("%d",&user.length);
 	while(user.length<=0)
@@ -94,9 +199,8 @@ int main()
 		scanf("%d",&user.length);
 	}
 
-	system("cls");
 	user.Xmed_table=(int*)malloc(user.length*sizeof(int));
-	user.mode_table=(int*)malloc(user.length*sizeof(int));
+	user.mode_table=(int*)malloc(user.length*sizeof(int));	
 	user.input_xi=(float*)malloc(user.length*sizeof(float));
 	user.input_ni=(float*)malloc((user.length+2)*sizeof(float));
 	user.N=0 ; user.Xbar=0 ;
@@ -109,8 +213,8 @@ int main()
 	user.table_3=(float*)malloc((user.length+2)*sizeof(float));// ni*(xi-Xbar)^2
 	for(int i=0;i<user.length;i++)
 	{
-		print_ligne("xi",user.input_xi,user.length,i,"           ",' ');
-		print_ligne("ni",user.input_ni,user.length,i,"           ",' ');
+		print_ligne("xi",NULL,user.input_xi,user.length,i,"           ",' ');
+		print_ligne("ni",NULL,user.input_ni,user.length,i,"           ",' ');
 		printf("Donner moi  x%d: ",i+1);
 		scanf("%f",&user.input_xi[i]);
 		printf("Donner moi  n%d: ",i+1);
@@ -121,78 +225,26 @@ int main()
 		user.Xbar+=user.XiNi_table[i] ;
 		system("cls");
 	}
-	user.input_ni[user.length]=user.N;
-	user.XiNi_table[user.length]=user.Xbar;
-	user.Xbar/=user.N ;
-	user.XiNi_table[user.length+1]=user.Xbar;
-	user.table_1[user.length]=0;
-	user.table_2[user.length]=0;
-	user.table_3[user.length]=0;
-	user.fi_table[user.length]=0;
-	user.Pi_table[user.length]=0;
-	for(int i=0 ; i<user.length ; i++)
-	{
-		user.table_1[i]=(user.Xbar-user.input_xi[i]>0)? user.Xbar-user.input_xi[i]:-user.Xbar+user.input_xi[i] ;
-		user.table_1[user.length]+=user.table_1[i];
-		user.table_2[i]=user.table_1[i]*user.input_ni[i];
-		user.table_3[i]=user.input_ni[i]*pow(user.table_1[i],2);
-		user.table_2[user.length]+=user.table_2[i];
-		user.table_3[user.length]+=user.table_3[i];
-		user.fi_table[i]=user.input_ni[i]/user.N;
-		user.fi_table[user.length]+=user.fi_table[i];
-		user.Pi_table[i]=user.fi_table[i]*100;
-		user.Pi_table[user.length]+=user.Pi_table[i];
-	}
-	user.table_1[user.length+1]=user.table_1[user.length]/user.N;
-	user.table_2[user.length+1]=user.table_2[user.length]/user.N;
-	user.table_3[user.length+1]=user.table_3[user.length]/user.N;
-	user.variance=user.table_3[user.length+1];
-	user.ecart_type=sqrt(user.variance);
-	check_mode(&user);
-	check_med(&user);
-	system("cls");
-	if(user.length<=8)
-	{for(int i=0;i<user.length*14+18;i++)
-			printf(" ");
-		printf("#############################\n");
-		for(int i=0;i<user.length*14+18;i++)
-			printf(" ");
-		printf("#     somme   #   somme/N   #\n");
-		for(int i=0;i<user.length*14+18;i++)
-			printf(" ");
-		printf("#############################\n");}
-	print_ligne("xi",user.input_xi,(user.length<=8)? user.length+2:user.length,user.length,"           ",' ');
-	print_ligne("ni",user.input_ni,(user.length<=8)? user.length+2:user.length,(user.length<=8)? user.length+1:user.length,"           ",' ');
-	print_ligne("Ni",user.Ni_table,(user.length<=8)? user.length+2:user.length,user.length,"           ",' ');
-	print_ligne("fi",user.fi_table,(user.length<=8)? user.length+2:user.length,(user.length<=8)? user.length+1:user.length,"           ",' ');
-	print_ligne("Pi",user.Pi_table,(user.length<=8)? user.length+2:user.length,(user.length<=8)? user.length+1:user.length,"           ",'%');
-	print_ligne("xi*ni",user.XiNi_table,(user.length<=8)? user.length+2:user.length,(user.length<=8)? user.length+2:user.length,"  ",' ');
-	print_ligne("|xi-Xbar|",user.table_1,(user.length<=8)? user.length+2:user.length,(user.length<=8)? user.length+2:user.length,"  ",' ');
-	print_ligne("ni*|xi-Xbar|",user.table_2,(user.length<=8)? user.length+2:user.length,(user.length<=8)? user.length+2:user.length,"  ",' ');
-	print_ligne("ni*(xi-Xbar)^2",user.table_3,(user.length<=8)? user.length+2:user.length,(user.length<=8)? user.length+2:user.length,"  ",' ');
-	printf(">>>>> les parametres de position\n");
-	printf("le nombre des modes: %d\n",user.mode_nb+1);
-	for(int i=0 ;i<=user.mode_nb;i++)
-		printf("mode %d: x%d= %10.4f\n",i+1,user.mode_table[i]+1,user.input_xi[user.mode_table[i]]);
-	printf("\nla moyenne arithmetique: Xbar=%10.4f",user.Xbar);
-	printf("\nla mediane :             x%d = %10.4f\n\n",user.Xmed_table[0]+1,user.input_xi[user.Xmed_table[0]]);
-	printf(">>>>> les parametres de dispertion\n\n");
-	printf("La variance:      V(x)= %10.4f\n",user.variance);
-	printf("Ecart type moyen: E(x)= %10.4f\n",user.table_2[user.length+1]);
-	printf("Ecart type:       e(x)= %10.4f\n",user.ecart_type);
-	printf("Etendue:         x1-x%d= %10.4f\n",user.length,user.input_xi[user.length-1]-user.input_xi[0]);
-	
+	print_info(NULL,&user);
 	int answer ;
-	printf("1: reessayer\n2: Sortie\nentrez la reponse:");
+	printf("1: reessayer\n2: Exporter une copie!\n3: Sortie\nentrez la reponse:");
 	scanf("%d",&answer);
-	while(answer!=1 && answer!=2)
+	while(answer!=1 && answer!=2 && answer!=3)
 	{
-		printf("1: reessayer\n2: Sortie\nentrez la reponse:");
+		printf("1: reessayer\n2: Exporter une copie!\n3: Sortie\nentrez la reponse:");
 		scanf("%d",&answer);
 	}
-	if(answer==1)
-		main();
-	else
-		exit(1);
+	switch(answer)
+	{
+		case 1 : 
+		{
+			main();
+		}
+		case 2 : 
+		{
+			print_info("output.dat",&user);
+		}
+		case 3 : exit(1);
+	}
 	return 0 ;
 }
