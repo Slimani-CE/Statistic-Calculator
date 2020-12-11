@@ -102,36 +102,41 @@ void check_med(STATISTIC *f_user)
 
 void print_info(char* file_name , STATISTIC *f_user)// if the user wanted to export a file the file_name!=NULL, otherwise it will be, 
 {
-	f_user->input_ni[f_user->length]=f_user->N;
-	f_user->XiNi_table[f_user->length]=f_user->Xbar;
-	f_user->Xbar/=f_user->N ;
-	f_user->XiNi_table[f_user->length+1]=f_user->Xbar;
-	f_user->table_1[f_user->length]=0;
-	f_user->table_2[f_user->length]=0;
-	f_user->table_3[f_user->length]=0;
-	f_user->fi_table[f_user->length]=0;
-	f_user->Pi_table[f_user->length]=0;
-	for(int i=0 ; i<f_user->length ; i++)
-	{
-		f_user->table_1[i]=(f_user->Xbar-f_user->input_xi[i]>0)? f_user->Xbar-f_user->input_xi[i]:-f_user->Xbar+f_user->input_xi[i] ;
-		f_user->table_1[f_user->length]+=f_user->table_1[i];
-		f_user->table_2[i]=f_user->table_1[i]*f_user->input_ni[i];
-		f_user->table_3[i]=f_user->input_ni[i]*pow(f_user->table_1[i],2);
-		f_user->table_2[f_user->length]+=f_user->table_2[i];
-		f_user->table_3[f_user->length]+=f_user->table_3[i];
-		f_user->fi_table[i]=f_user->input_ni[i]/f_user->N;
-		f_user->fi_table[f_user->length]+=f_user->fi_table[i];
-		f_user->Pi_table[i]=f_user->fi_table[i]*100;
-		f_user->Pi_table[f_user->length]+=f_user->Pi_table[i];
+	//Calculations
+	if(!file_name){
+		f_user->input_ni[f_user->length]=f_user->N;
+		f_user->XiNi_table[f_user->length]=f_user->Xbar;
+		f_user->Xbar/=f_user->N ;
+		f_user->XiNi_table[f_user->length+1]=f_user->Xbar;
+		f_user->table_1[f_user->length]=0;
+		f_user->table_2[f_user->length]=0;
+		f_user->table_3[f_user->length]=0;
+		f_user->fi_table[f_user->length]=0;
+		f_user->Pi_table[f_user->length]=0;
+		for(int i=0 ; i<f_user->length ; i++)
+		{
+			f_user->table_1[i]=(f_user->Xbar-f_user->input_xi[i]>0)? f_user->Xbar-f_user->input_xi[i]:-f_user->Xbar+f_user->input_xi[i] ;
+			f_user->table_1[f_user->length]+=f_user->table_1[i];
+			f_user->table_2[i]=f_user->table_1[i]*f_user->input_ni[i];
+			f_user->table_3[i]=f_user->input_ni[i]*pow(f_user->table_1[i],2);
+			f_user->table_2[f_user->length]+=f_user->table_2[i];
+			f_user->table_3[f_user->length]+=f_user->table_3[i];
+			f_user->fi_table[i]=f_user->input_ni[i]/f_user->N;
+			f_user->fi_table[f_user->length]+=f_user->fi_table[i];
+			f_user->Pi_table[i]=f_user->fi_table[i]*100;
+			f_user->Pi_table[f_user->length]+=f_user->Pi_table[i];
+		}
+		f_user->table_1[f_user->length+1]=f_user->table_1[f_user->length]/f_user->N;
+		f_user->table_2[f_user->length+1]=f_user->table_2[f_user->length]/f_user->N;
+		f_user->table_3[f_user->length+1]=f_user->table_3[f_user->length]/f_user->N;
+		f_user->variance=f_user->table_3[f_user->length+1];
+		f_user->ecart_type=sqrt(f_user->variance);
+		check_mode(f_user);
+		check_med(f_user);
 	}
-	f_user->table_1[f_user->length+1]=f_user->table_1[f_user->length]/f_user->N;
-	f_user->table_2[f_user->length+1]=f_user->table_2[f_user->length]/f_user->N;
-	f_user->table_3[f_user->length+1]=f_user->table_3[f_user->length]/f_user->N;
-	f_user->variance=f_user->table_3[f_user->length+1];
-	f_user->ecart_type=sqrt(f_user->variance);
-	check_mode(f_user);
-	check_med(f_user);
-	system("cls");
+
+
+	if(!file_name){system("cls");}
 	if(f_user->length<=8 && !file_name)
 	{
 		for(int i=0;i<f_user->length*14+18;i++)
@@ -146,7 +151,7 @@ void print_info(char* file_name , STATISTIC *f_user)// if the user wanted to exp
 	}
 	if(f_user->length<=8 && file_name)
 	{
-		FILE *file=fopen(file_name,"a");
+		FILE *file=fopen(file_name,"w");
 		for(int i=0;i<f_user->length*14+18;i++)
 			fprintf(file," ");
 		fprintf(file,"#############################\n");
@@ -238,11 +243,26 @@ int main()
 	{
 		case 1 : 
 		{
-			main();
+			main();break;
 		}
 		case 2 : 
 		{
+
 			print_info("output.dat",&user);
+			printf("\n>>> les resultats de votre tableau sont disponible sur le fichier ""output.dat""\n");
+			printf("1: reessayer\n2: Sortie\nentrez la reponse:");
+			scanf("%d",&answer);
+			while(answer!=1 && answer!=2 )
+			{
+				printf("1: reessayer\n2: Sortie\nentrez la reponse:");
+				scanf("%d",&answer);
+			}
+			if (answer-1)
+			{
+				exit(1);
+			}
+			else main();
+			break ;
 		}
 		case 3 : exit(1);
 	}
