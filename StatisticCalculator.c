@@ -184,7 +184,23 @@ void print_info(char* file_name , STATISTIC *f_user)// if the user wanted to exp
 		printf("La variance:      V(x)= %10.4f\n",f_user->variance);
 		printf("Ecart type moyen: E(x)= %10.4f\n",f_user->table_2[f_user->length+1]);
 		printf("Ecart type:       e(x)= %10.4f\n",f_user->ecart_type);
-		printf("Etendue:         x1-x%d= %10.4f\n",f_user->length,f_user->input_xi[f_user->length-1]-f_user->input_xi[0]);
+		printf("Etendue:         x%d-x1= %10.4f\n",f_user->length,f_user->input_xi[f_user->length-1]-f_user->input_xi[0]);
+	}
+	else
+	{
+		FILE *file=fopen(file_name,"a");
+		fprintf(file,">>>>> les parametres de position\n");
+		fprintf(file,"le nombre des modes: %d\n",f_user->mode_nb+1);
+		for(int i=0 ;i<=f_user->mode_nb;i++)
+			fprintf(file,"mode %d: x%d= %10.4f\n",i+1,f_user->mode_table[i]+1,f_user->input_xi[f_user->mode_table[i]]);
+		fprintf(file,"\nla moyenne arithmetique: Xbar=%10.4f",f_user->Xbar);
+		fprintf(file,"\nla mediane :             x%d = %10.4f\n\n",f_user->Xmed_table[0]+1,f_user->input_xi[f_user->Xmed_table[0]]);
+		fprintf(file,">>>>> les parametres de dispertion\n\n");
+		fprintf(file,"La variance:      V(x)= %10.4f\n",f_user->variance);
+		fprintf(file,"Ecart type moyen: E(x)= %10.4f\n",f_user->table_2[f_user->length+1]);
+		fprintf(file,"Ecart type:       e(x)= %10.4f\n",f_user->ecart_type);
+		fprintf(file,"Etendue:         x%d-x1= %10.4f\n",f_user->length,f_user->input_xi[f_user->length-1]-f_user->input_xi[0]);
+		fclose(file);
 	}
 	
 }
@@ -249,7 +265,7 @@ int main()
 		{
 
 			print_info("output.dat",&user);
-			printf("\n>>> les resultats de votre tableau sont disponible sur le fichier ""output.dat""\n");
+			printf("\n>>> les resultats de votre tableau sont disponible sur le fichier \"output.dat\"\n");
 			printf("1: reessayer\n2: Sortie\nentrez la reponse:");
 			scanf("%d",&answer);
 			while(answer!=1 && answer!=2 )
