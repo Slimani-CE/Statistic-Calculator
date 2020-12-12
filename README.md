@@ -1,6 +1,8 @@
 # Statistic-Calculator
 
-Inputs let's firstly talk about the simple side, "the inputs" 
+#Inputs:
+
+let's firstly talk about the simple side, "the inputs" 
 the programme takes as inputs the number of table cases (N) after that takes N couples of inputs xi and ni, That's all 
 
 # Little mathematics explanations
