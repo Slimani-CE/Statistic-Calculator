@@ -21,7 +21,8 @@ of a statistic. The statistic is an estimate of a population parameter. A parame
 of the population. Since we considered all math classes to be the population, then the average number of points
 earned per student over all the math classes is an example of a parameter.
 
-we take a population of a data, and we organize each value (xi) and the number of her occurrence (ni) and organize them In ascending order in a table 
+we take a population of a data, and we organize each value (xi) and the number of her occurrence (ni)
+and organize them In ascending order in a table 
 like this:
 
 ########################################################################################################################
@@ -72,7 +73,8 @@ like this:
 
 * Identifies the spread of scores by stating intervals
 
-* Use this when you want to show how "spread out" the data are. It is helpful to know when your data are so spread out that it affects the mean
+* Use this when you want to show how "spread out" the data are. It is helpful to know when your data are so spread out that
+it affects the mean
 
 
 </pre>
