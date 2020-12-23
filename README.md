@@ -1,3 +1,4 @@
+<pre>
 # Statistic-Calculator
 
 #Inputs:
@@ -18,3 +19,4 @@ Since we considered all math classes to be the population, then the average numb
 we take a population of a data, and we organize each value (xi) and the number of her occurrence (ni) and organize them In ascending order in a table 
 like this:
 
+</pre>
